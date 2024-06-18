@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const createEmpleadosSchema = z.object({
+export const createEmployeesSchema = z.object({
     nombre: z.string({
         required_error: 'Nombre es requerido',
     }),

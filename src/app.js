@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import authRoutes from './routes/auth.routes.js';
-import empleadosRoutes from './routes/empleados.routes.js';
+import employeesRoutes from './routes/employees.routes.js';
 
 const app = express();
 
@@ -17,6 +17,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api", authRoutes);
-app.use("/api", empleadosRoutes);
+app.use("/api", employeesRoutes);
 
 export default app;
