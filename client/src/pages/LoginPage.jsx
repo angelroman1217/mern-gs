@@ -25,7 +25,7 @@ function LoginPage() {
         {signinErrors.map((error, i) => (
           <div className="bg-red-500 text-white p-2 text-center my-2" key={i} role="alert">{error}</div>
         ))}
-        <h1 className="text-2xl font-bold">Login</h1>
+        <h1 className="text-3xl font-bold my-2">Login</h1>
         <form onSubmit={onSubmit}>
           <input
             type="email"
@@ -34,7 +34,7 @@ function LoginPage() {
             placeholder="Email"
           />
 
-          {errors.email && <p className="text-red-500">Email is required</p>}
+          {errors.email && <p className="text-red-500">Email es requerido</p>}
 
           <input
             type="password"
@@ -43,11 +43,11 @@ function LoginPage() {
             placeholder="Password"
           />
 
-          {errors.password && <p className="text-red-500">Password is required</p>}
+          {errors.password && <p className="text-red-500">Password es requerido</p>}
 
-          <button type="submit">Login</button>
+          <button type="submit"  className="bg-blue-500 hover:bg-blue-600 text-white my-2 py-2 px-4 rounded">Entrar</button>
         </form>
-        <p className="flex gap-x-2 justify-between">Do not have an account? <Link to="/register" className="text-sky-500">Register</Link></p>
+        <p className="flex gap-x-2 justify-between">¿No tienes cuenta? <Link to="/register" className="text-sky-500">Registrate</Link></p>
       </div>
     </div>
   )

@@ -10,8 +10,8 @@ function EmployeeCard({ employee }) {
           {employee.nombre} {employee.app} {employee.apm}
         </h1>
         <div className="flex gap-x-2 items-center">
-          <button onClick={() => deleteEmployee(employee._id)}>delete</button>
-          <Link to={`/employees/${employee._id}`}>edit</Link>
+          <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded" onClick={() => deleteEmployee(employee._id)}>delete</button>
+          <Link to={`/employees/${employee._id}`} className="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded">edit</Link>
         </div>
       </header>
       <p>
