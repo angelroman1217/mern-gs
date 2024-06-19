@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { createEmployeeRequest, getEmployeesRequest } from "../api/employees";
+import { createEmployeeRequest, getEmployeesRequest, getEmployeeRequest, deleteEmployeeRequest, updateEmployeeRequest } from "../api/employees";
 
 const EmployeesContext = createContext();
 
@@ -32,8 +32,34 @@ export function EmployeesProvider({ children }) {
     }
   }
 
+  const deleteEmployee = async (id) => {
+    try {
+      const res = await deleteEmployeeRequest(id);
+      if (res.status === 204) setEmployees(employees.filter(employee => employee._id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getEmployee = async (id) => {
+    try {
+      const res = await getEmployeeRequest(id);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const updateEmployee = async (id, employee) => {
+    try {
+      await updateEmployeeRequest(id, employee);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
-    <EmployeesContext.Provider value={{ employees, createEmployees, getEmployees }}>
+    <EmployeesContext.Provider value={{ employees, createEmployees, getEmployees, getEmployee, deleteEmployee, updateEmployee }}>
       {children}
     </EmployeesContext.Provider>
   );

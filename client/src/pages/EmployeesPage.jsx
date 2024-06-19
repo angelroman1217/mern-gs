@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useEmployees } from '../context/EmployeesContext'
+import EmployeeCard from '../components/EmployeeCard';
 function EmployeesPage() {
   const { getEmployees, employees } = useEmployees();
 
@@ -9,16 +10,9 @@ function EmployeesPage() {
 
   if (employees.length === 0) return(<h1>No hay empleados</h1>)
   return (
-    <div>
-      {employees.map((employee, i) => (
-        <div key={i}>
-          <p>{employee.nombre}</p>
-          <p>{employee.app}</p>
-          <p>{employee.apm}</p>
-          <p>{employee.nacimiento}</p>
-          <p>{employee.nacionalidad}</p>
-          <p>{employee.funciones}</p>
-        </div>
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+      {employees.map((employee) => (
+        <EmployeeCard key={employee._id} employee={employee} />
       ))}
     </div>
   )

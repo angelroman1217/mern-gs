@@ -10,24 +10,28 @@ import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
 
 import ProtectedRoute from "./ProtectedRoute";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <AuthProvider>
       <EmployeesProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+          <main className="container mx-auto px-10">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/employees" element={<EmployeesPage />} />
-              <Route path="/add-employees" element={<EmployeesFormPage />} />
-              <Route path="/employees/:id" element={<EmployeesFormPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
-          </Routes>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/employees" element={<EmployeesPage />} />
+                <Route path="/add-employees" element={<EmployeesFormPage />} />
+                <Route path="/employees/:id" element={<EmployeesFormPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+            </Routes>
+          </main>
         </BrowserRouter>
       </EmployeesProvider>
     </AuthProvider>
