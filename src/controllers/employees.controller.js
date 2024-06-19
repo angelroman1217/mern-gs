@@ -1,11 +1,28 @@
 import Employees from "../models/employee.model.js";
-import bcrypt from "bcryptjs";
-import { createAccessToken } from "../libs/jwt.js";
+import redis from "redis";
+import { promisify } from "util";
+
+const client = redis.createClient({
+  host: "127.0.0.1",
+  port: 6379,
+  legacyMode: true
+});
+
+await client.connect();
+
+const ASYNC_GET = promisify(client.get).bind(client);
+const ASYNC_SET = promisify(client.set).bind(client);
 
 export const getEmployees = async (req, res) => {
   try {
+    const reply = await ASYNC_GET("employees");
+    if (reply) {
+      return res.json(JSON.parse(reply));
+    }
     const employees = await Employees.find().lean();
+    await ASYNC_SET("employees", JSON.stringify(employees));
     res.json(employees);
+
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }
@@ -32,10 +49,16 @@ export const createEmployees = async (req, res) => {
 
 export const getEmployee = async (req, res) => {
   try {
-    const employees = await Employees.findById(req.params.id).lean();
-    if (!employees)
+    const reply = await ASYNC_GET(req.params.id);
+    if (reply) {
+      return res.json(JSON.parse(reply));
+    }
+    const employee = await Employees.findById(req.params.id).lean()
+    if (!employee)
       return res.status(404).json({ message: "Employee not found" });
-    res.json(employees);
+
+    await ASYNC_SET(req.params.id, JSON.stringify(employee));
+    res.json(employee);
   } catch (error) {
     return res.status(404).json({ message: "Employee not found" });
   }

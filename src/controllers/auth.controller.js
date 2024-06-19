@@ -3,6 +3,19 @@ import bcrypt from 'bcryptjs';
 import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
+import redis from "redis";
+import { promisify } from "util";
+
+const client = redis.createClient({
+  host: "127.0.0.1",
+  port: 6379,
+  legacyMode: true
+});
+
+await client.connect();
+
+const ASYNC_GET = promisify(client.get).bind(client);
+const ASYNC_SET = promisify(client.set).bind(client);
 
 export const register = async (req, res) => {
   const { email, password, username } = req.body;
@@ -64,36 +77,34 @@ export const logout = (req, res) => {
   return res.sendStatus(200);
 }
 
-export const profile = async(req, res) => {
-  const userFound = await User.findById(req.user.id);
-  if(!userFound) return res.status(400).json({"message": "User not found"});
-
-  return res.json({
-    id: userFound._id,
-    username: userFound.username,
-    email: userFound.email,
-    rol: userFound.rol,
-    createdAt: userFound.createdAt,
-    updatedAt: userFound.updatedAt,
-  })
-}
-
 export const verifyToken = async(req, res) => {
   const { token } = req.cookies;
 
   if(!token) return res.status(401).json({"message": "Unauthorized"});
 
-  jwt.verify(token, TOKEN_SECRET, (err, user) => {
+  jwt.verify(token, TOKEN_SECRET, async(err, user) => {
     if (err) return res.status(403).json({ message: "Invalid token" });
     
-    const userFound = User.findById(user.id);
+    const reply = await ASYNC_GET(user.id);
+    if (reply) {
+      return res.json(JSON.parse(reply));
+    }
+
+    const userFound = await User.findById(user.id).lean();
     if(!userFound) return res.status(401).json({"message": "User not found"});
+
+    await ASYNC_SET(user.id, JSON.stringify({
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt,
+      updatedAt: userFound.updatedAt,
+    }));
 
     return res.json({
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
-      rol: userFound.rol,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
 

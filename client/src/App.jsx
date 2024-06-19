@@ -6,7 +6,6 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import EmployeesFormPage from "./pages/EmployeesFormPage";
-import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -28,7 +27,6 @@ function App() {
                 <Route path="/employees" element={<EmployeesPage />} />
                 <Route path="/add-employees" element={<EmployeesFormPage />} />
                 <Route path="/employees/:id" element={<EmployeesFormPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
               </Route>
             </Routes>
           </main>
