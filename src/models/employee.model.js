@@ -28,11 +28,6 @@ const EmpleadosSchema = new Schema({
     trim: true
   },
   funciones: [],
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "Users",
-    required: true
-  }
 
 }, {
   timestamps: true,

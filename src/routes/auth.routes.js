@@ -14,63 +14,49 @@ const router = Router();
  *     User:
  *       type: object
  *       properties:
- *         _id:
- *           type: ObjectId
  *         username:
  *           type: string
+ *           description: Nombre de usuario
  *         email:
  *           type: string
+ *           description: Email del usuario          
  *         password:
  *           type: string
+ *           description: Password del usuario
  *         createdAt:
  *           type: date
+ *           description: Fecha de creación del usuario (Se genera automaticamente)
  *         updatedAt:
  *           type: date
+ *           description: Fecha de actualización del usuario (Se genera automaticamente)
  *       required:
  *         - username
  *         - email
  *         - password
  *       example:
- *         _id: 123
- *         username: John
- *         email: 2Hb6H@example.com
- *         password: john123
- *         createdAt: 2022-01-01
- *         updatedAt: 2022-01-01
- *   responses:
- *     200:
- *       description: Crea un nuevo usuario
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/user.model.js'
- *     400:
- *       description: El usuario ya existe
-
+ *         username: user
+ *         email: user@example.com
+ *         password: string
  */
-
 
 /**
  * @openapi
  * /api/register:
  *  post:
- *     tags: [auth]
- *     summary: Crea un nuevo usuario
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
+ *    tags: [User]
+ *    summary: Crea un nuevo usuario
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            $ref: '#/components/schemas/User'
+ *    responses:
+ *      200:
+ *        description: Usuario creado exitosamente e inicia sesion automáticamente
+ *      500:
+ *        description: Error al registrar
 */
 router.post("/register", validateSchema(registerSchema), register);
 
@@ -79,21 +65,31 @@ router.post("/register", validateSchema(registerSchema), register);
  * @openapi
  * /api/login:
  *  post:
- *     tags: [auth]
- *     summary: Iniciar sesion
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
+ *    tags: [User]
+ *    summary: Iniciar sesion
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                format: email
+ *                description: Email del usuario
+ *              password:
+ *                type: string
+ *                format: password
+ *                description: Password del usuario
+ * 
+ *    responses:
+ *      200:
+ *        description: Inicio de sesion exitóso
+ *      400:
+ *        description: Usuario inexistente
+ *      500:
+ *        description: Error al iniciar sesion
 */
 router.post("/login", validateSchema(loginSchema), login);
 
@@ -102,7 +98,7 @@ router.post("/login", validateSchema(loginSchema), login);
  * @openapi
  * /api/logout:
  *  post:
- *     tags: [auth]
+ *     tags: [User]
  *     summary: Cierre de sesión
  *     requestBody:
  *       required: true
@@ -114,6 +110,9 @@ router.post("/login", validateSchema(loginSchema), login);
  *               token:
  *                 type: string
  *                 format: token
+ *     responses:
+ *      200:
+ *        description: Cierre de sesión exitoso
 */
 router.post("/logout", logout);
 
@@ -122,7 +121,7 @@ router.post("/logout", logout);
  * @openapi
  * /api/verify:
  *  post:
- *     tags: [auth]
+ *     tags: [User]
  *     summary: Verifica el token
  *     requestBody:
  *       required: true
@@ -134,6 +133,15 @@ router.post("/logout", logout);
  *               token:
  *                 type: string
  *                 format: token
+ *     responses:
+ *      200:
+ *        description: Token verificado y regresa el usuario encontrado
+ *      401:
+ *        description: Usuario no autorizado
+ *      403:
+ *        description: Token no verificado
+ *      500:
+ *        description: Error al verificar
 */
 router.post("/verify", authRequired, verifyToken);
 

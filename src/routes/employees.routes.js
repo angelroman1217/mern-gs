@@ -14,20 +14,24 @@ const router = Router();
  *     Employee:
  *       type: object
  *       properties:
- *         _id:
- *           type: ObjectId
  *         nombre:
  *           type: string
+ *           description: Nombre del empleado
  *         app:
  *           type: string
+ *           description: Apellido paterno del empleado
  *         apm:
  *           type: string
+ *           description: Apellido materno del empleado
  *         nacimiento:
  *           type: date
+ *           description: Fecha de nacimiento del empleado
  *         nacionalidad:
  *           type: string
+ *           description: Nacionalidad del empleado
  *         funciones:
  *           type: array
+ *           description: Funciones del empleado
  *           items:
  *             type: string
  *       required:
@@ -38,56 +42,12 @@ const router = Router();
  *         - nacionalidad
  *         - funciones
  *       example:
- *         _id: 123
  *         nombre: John
  *         app: Doe
  *         apm: Smith
  *         nacimiento: 1990-01-01
  *         nacionalidad: USA
  *         funciones: ["funcion1", "funcion2"]
- *   responses:
- *     EmployeeNotFound:
- *       description: Employee not found
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeFound:
- *       description: Employee found
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeList:
- *       description: Employee list
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeCreated:
- *       description: Employee created
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeUpdated:
- *       description: Employee updated
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeDeleted:
- *       description: Employee deleted
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
- *     EmployeeError:
- *       description: Something went wrong
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/models/employee.model.js'
  * */
 
 
@@ -95,21 +55,19 @@ const router = Router();
  * @openapi
  * /api/employees:
  *   get:
- *     tags: [employees]
- *     summary: Obtiene todos los empleados
+ *     tags: [Employee]
+ *     summary: Obtiene todos los empleados (Se necesita estar loggeado para su ejecución)
  *     responses:
  *       200:
- *         description: OK
+ *         description: Empleados obtenidos exitosamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/controllers/employees.controller.js'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
+ *               type: array
+ *               items:
+ *                  $ref: '#/components/schemas/Employee'
+ *       500:
+ *         description: Error al obtener los empleados
  * 
  * */
 
@@ -117,23 +75,28 @@ router.get("/employees", authRequired, getEmployees);
 
 /**
  * @openapi
- * /api/employees/:id:
- *  get:
- *     tags: [employees]
- *     summary: Obtiene un solo empleado
+ * /api/employees/{id}:
+ *   get:
+ *     tags: [Employee]
+ *     summary: Obtiene solo un empleado (Se necesita estar loggeado para su ejecución)
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: ID del empleado
  *     responses:
  *       200:
- *         description: OK
+ *         description: Empleado obtenido exitosamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/controllers/employees.controller.js'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
+ *               type: object
+ *               $ref: '#/components/schemas/Employee'
+ *       404:
+ *         description: Empleado no encontrado
+ * 
  * */
 
 router.get("/employees/:id", authRequired, getEmployee);
@@ -142,82 +105,73 @@ router.get("/employees/:id", authRequired, getEmployee);
  * @openapi
  * /api/employees:
  *  post:
- *     tags: [employees]
- *     summary: Crea un nuevo empleado
+ *     tags: [Employee]
+ *     summary: Crea un nuevo empleado (Se necesita estar loggeado para su ejecución)
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *              nombre:
- *                 type: string
- *              app:
- *                 type: string
- *              apm:
- *                 type: string
- *              nacimiento:
- *                 type: date
- *              nacionalidad:
- *                 type: string
- *              funciones:
- *                 type: array
- *                 items:
- *                   type: string
- *             example:
- *              nombre: John
- *              app: Doe
- *              apm: Smith
- *              nacimiento: 1990-01-01
- *              nacionalidad: USA
- *              funciones: ["funcion1", "funcion2"]
+ *             $ref: '#/components/schemas/Employee'
+ *     responses:
+ *       200:
+ *         description: Empleado creado exitosamente
+ *       500:
+ *         description: Error al registrar
  * */
 
 router.post("/employees", authRequired, validateSchema(createEmployeesSchema), createEmployees);
 
 /**
  * @openapi
- * /api/employees/:id:
- *  delete:
- *     tags: [employees]
- *     summary: Elimina un empleado
+ * /api/employees/{id}:
+ *   delete:
+ *     tags: [Employee]
+ *     summary: Elimina un empleado (Se necesita estar loggeado para su ejecución)
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: ID del empleado
  *     responses:
- *       200:
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
+ *       204:
+ *         description: Empleado eliminado exitosamente
+ *       404:
+ *         description: Empleado no encontrado
+ * 
  * */
 
 router.delete("/employees/:id", authRequired, deleteEmployees);
 
 /**
  * @openapi
- * /api/employees/:id:
- *  put:
- *     tags: [employees]
- *     summary: Actualiza un empleado
+ * /api/employees/{id}:
+ *   put:
+ *     tags: [Employee]
+ *     summary: Actualiza un empleado (Se necesita estar loggeado para su ejecución)
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: ID del empleado
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/components/schemas/Employee'
  *     responses:
  *       200:
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/controllers/employees.controller.js'
+ *         description: Empleado actualizado exitosamente
+ *       404:
+ *         description: Empleado no encontrado
+ * 
  * */
 
 router.put("/employees/:id", authRequired, updateEmployees);

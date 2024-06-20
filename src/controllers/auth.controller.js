@@ -82,7 +82,7 @@ export const logout = (req, res) => {
 export const verifyToken = async(req, res) => {
   const { token } = req.cookies;
 
-  if(!token) return res.status(401).json({"message": "Unauthorized"});
+  if(!token) return res.status(401).json({"message": "User not found"});
 
   jwt.verify(token, TOKEN_SECRET, async(err, user) => {
     if (err) return res.status(403).json({ message: "Invalid token" });
