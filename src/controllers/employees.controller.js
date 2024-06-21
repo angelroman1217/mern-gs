@@ -1,29 +1,37 @@
 import Employees from "../models/employee.model.js";
-import redis from "redis";
-import { promisify } from "util";
+import { createClient } from "redis";
 
-const client = redis.createClient({
-  legacyMode: true,
-  socket: {
-    port: process.env.REDIS_PORT || 6379,
-    host: process.env.REDIS_HOST || 'localhost'
+var obj = {};
+if (process.env.REDIS_URL) {
+  obj = {
+    url: process.env.REDIS_URL
   }
+} else {
+  obj = {
+    host: 'localhost',
+    port: 6379
+  }
+}
+
+const client = createClient(obj);
+
+client.on('error', (err) => {
+  console.error('Redis error:', err);
 });
 
-await client.connect().catch(console.error);
+(async () => {
+  await client.connect();
+})();
 
-const ASYNC_GET = promisify(client.get).bind(client);
-const ASYNC_SET = promisify(client.set).bind(client);
-const ASYNC_DEL = promisify(client.del).bind(client);
 
 export const getEmployees = async (req, res) => {
   try {
-    const reply = await ASYNC_GET("employees");
+    const reply = await client.get("employees");
     if (reply) {
       return res.json(JSON.parse(reply));
     }
     const employees = await Employees.find().lean();
-    await ASYNC_SET("employees", JSON.stringify(employees));
+    await client.set("employees", JSON.stringify(employees));
     res.json(employees);
 
   } catch (error) {
@@ -45,7 +53,7 @@ export const createEmployees = async (req, res) => {
     });
     const savedEmployees = await newEmployees.save();
     const employees = await Employees.find().lean();
-    await ASYNC_SET("employees", JSON.stringify(employees));
+    await client.set("employees", JSON.stringify(employees));
     res.json(savedEmployees);
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
@@ -54,7 +62,7 @@ export const createEmployees = async (req, res) => {
 
 export const getEmployee = async (req, res) => {
   try {
-    const reply = await ASYNC_GET(req.params.id);
+    const reply = await client.get(req.params.id);
     if (reply) {
       return res.json(JSON.parse(reply));
     }
@@ -62,7 +70,7 @@ export const getEmployee = async (req, res) => {
     if (!employee)
       return res.status(404).json({ message: "Employee not found" });
 
-    await ASYNC_SET(req.params.id, JSON.stringify(employee));
+    await client.set(req.params.id, JSON.stringify(employee));
     res.json(employee);
   } catch (error) {
     return res.status(404).json({ message: "Employee not found" });
@@ -75,13 +83,13 @@ export const deleteEmployees = async (req, res) => {
     if (!employeeDeleted)
       return res.status(404).json({ message: "Employee not found" });
 
-    const reply = await ASYNC_GET(req.params.id);
+    const reply = await client.get(req.params.id);
     if (reply) {
-      await ASYNC_DEL(req.params.id);
+      await client.del(req.params.id);
     }
 
     const employees = await Employees.find().lean();
-    await ASYNC_SET("employees", JSON.stringify(employees));
+    await client.set("employees", JSON.stringify(employees));
     return res.sendStatus(204);
   } catch (error) {
     return res.status(404).json({ message: "Employee not found" });
@@ -100,14 +108,14 @@ export const updateEmployees = async (req, res) => {
     if (!employeesUpdated)
       return res.status(404).json({ message: "Employees not found" });
 
-    const reply = await ASYNC_GET(req.params.id);
+    const reply = await client.get(req.params.id);
     if (reply) {
-      await ASYNC_DEL(req.params.id);
-      await ASYNC_SET(req.params.id, JSON.stringify(employeesUpdated));
+      await client.del(req.params.id);
+      await client.set(req.params.id, JSON.stringify(employeesUpdated));
     }
 
     const employees = await Employees.find().lean();
-    await ASYNC_SET("employees", JSON.stringify(employees));
+    await client.set("employees", JSON.stringify(employees));
     res.json(employeesUpdated);
   } catch (error) {
     return res.status(404).json({ message: "Employee not found" });

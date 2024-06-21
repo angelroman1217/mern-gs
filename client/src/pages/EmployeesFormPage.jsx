@@ -35,12 +35,12 @@ function EmployeesFormPage() {
     loadEmployee();
   }, []);
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(async(data) => {
     data.funciones = funciones;
     if (params.id) {
-      updateEmployee(params.id, data);
+      await updateEmployee(params.id, data);
     } else {
-      createEmployees(data);
+      await createEmployees(data);
     }
     navigate("/employees");
   });
@@ -116,62 +116,6 @@ function EmployeesFormPage() {
               +
             </button>
           </div>
-          {/* {funciones.length > 0 && (
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-24">
-              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 top-0 sticky">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="border-r px-6 py-2 dark:border-neutral-500 w-11/12"
-                    >
-                      Funciones
-                    </th>
-                    <th
-                      scope="col"
-                      className="border-r px-4 py-2 dark:border-neutral-500"
-                    >
-                      Borrar
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className=" overflow-y-auto">
-                  {funciones.map((funcion, i) => (
-                    <tr key={i}>
-                      <td className="whitespace-nowrap border-r px-6 py-2 dark:border-neutral-500">
-                        <span className="font-bold pr-3">•</span>{funcion}
-                      </td>
-                      <td className="whitespace-nowrap border-r px-6 py-2 dark:border-neutral-500 flex justify-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFunciones(funciones.filter((f) => f !== funcion));
-                          }}
-                        >
-                          <svg
-                            className="w-3 h-3 text-red-500"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 14 14"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                            />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-          )} */}
 
           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
         </form>

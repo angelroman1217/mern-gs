@@ -19,7 +19,7 @@ function Navbar() {
               Bienvenido:  {user.username}
             </li>
             <li>
-              <Link to="/add-employees" className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded">+ Agregar Usuarios</Link>
+              <Link to="/add-employees" className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded">+ Agregar Empleados</Link>
             </li>
             <li>
               <Link to="/" onClick={() => logout()}>Salir</Link>

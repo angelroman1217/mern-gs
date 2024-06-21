@@ -3,21 +3,28 @@ import bcrypt from 'bcryptjs';
 import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
-import redis from "redis";
-import { promisify } from "util";
+import { createClient } from "redis";
 
-const client = redis.createClient({
-  legacyMode: true,
-  socket: {
-    port: process.env.REDIS_PORT || 6379,
-    host: process.env.REDIS_HOST || 'localhost'
+var obj = {};
+if (process.env.REDIS_URL) {
+  obj = {
+    url: process.env.REDIS_URL
   }
+} else {
+  obj = {
+    host: 'localhost',
+    port: 6379
+  }
+}
+const client = createClient(obj);
+
+client.on('error', (err) => {
+  console.error('Redis error:', err);
 });
 
-await client.connect();
-
-const ASYNC_GET = promisify(client.get).bind(client);
-const ASYNC_SET = promisify(client.set).bind(client);
+(async () => {
+  await client.connect();
+})();
 
 export const register = async (req, res) => {
   const { email, password, username } = req.body;
@@ -87,7 +94,7 @@ export const verifyToken = async(req, res) => {
   jwt.verify(token, TOKEN_SECRET, async(err, user) => {
     if (err) return res.status(403).json({ message: "Invalid token" });
     
-    const reply = await ASYNC_GET(user.id);
+    const reply = await client.get(user.id);
     if (reply) {
       return res.json(JSON.parse(reply));
     }
@@ -95,7 +102,7 @@ export const verifyToken = async(req, res) => {
     const userFound = await User.findById(user.id).lean();
     if(!userFound) return res.status(401).json({"message": "User not found"});
 
-    await ASYNC_SET(user.id, JSON.stringify({
+    await client.set(user.id, JSON.stringify({
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
