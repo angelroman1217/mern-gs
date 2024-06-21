@@ -3,6 +3,6 @@ import { connectDB } from './db.js';
 import { swaggerDocs } from './swagger.js';
 
 connectDB();
-app.listen(3000)
-console.log('Server on port', 3000);
-swaggerDocs(app, 3000)
+app.listen(4000)
+console.log('Server on port', 4000);
+swaggerDocs(app, 4000)

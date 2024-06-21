@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "proxy": "http://localhost:3000",
+  "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "nodemon src/index.js",
     "debug": "nodemon --inspect src/index.js",

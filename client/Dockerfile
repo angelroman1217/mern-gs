@@ -1,7 +1,7 @@
 FROM node:16.14
-WORKDIR /app/client
+WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 4000
+EXPOSE 3000
 CMD ["npm", "run", "dev"]

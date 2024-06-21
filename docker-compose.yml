@@ -32,13 +32,12 @@
   version: "3.9"
   services:
     backend:
-      build: .
+      build: ./api
       container_name: node-backend
       ports:
-        - "3000:3000"
-      volumes:
-        - ./:/app
-        - /app/node_modules
+        - "4000:4000"
+      stdin_open: true
+      tty: true
       environment:
         - REDIS_URL=redis://redis:6379
       depends_on:
@@ -60,10 +59,12 @@
       build: ./client
       container_name: react-frontend
       ports:
-        - "4000:4000"
+        - "3000:3000"
       stdin_open: true
       tty: true
       command: npm run dev
+      environment:
+        - API_URL=http://backend:4000
       depends_on:
         - backend
-
+      
